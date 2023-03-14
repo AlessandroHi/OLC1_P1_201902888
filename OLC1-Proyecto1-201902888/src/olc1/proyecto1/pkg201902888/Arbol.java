@@ -25,7 +25,7 @@ public class Arbol {
     public void GraficarSintactico(String id) {
         Interfaz inter = new Interfaz();
         String grafica = "digraph Arbol_Sintactico{\n\n node[shape=\"record\"] \n\n" + GraficaNodos(this.raiz, "0", this.raiz.id) + "\n\n}";
-        inter.GenerarDot(grafica, id, "ARBOLES_201900096");
+        inter.GenerarDot(grafica, id, "ARBOLES_201902888");
     }
 
     private String GraficaNodos(Nodo nodo, String i, int id) {

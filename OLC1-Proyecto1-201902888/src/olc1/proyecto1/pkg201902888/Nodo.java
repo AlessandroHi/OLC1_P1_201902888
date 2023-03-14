@@ -295,7 +295,7 @@ public class Nodo {
                 + ">]\n"
                 + "}";
 
-        inter.GenerarDot(grafica, nombre_imagen, "SIGUIENTES_201900096");
+        inter.GenerarDot(grafica, nombre_imagen, "SIGUIENTES_201902888");
 
     }
 
