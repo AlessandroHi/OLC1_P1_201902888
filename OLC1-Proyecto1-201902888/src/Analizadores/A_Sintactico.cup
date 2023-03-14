@@ -1,0 +1,138 @@
+/*--------------- 1ra Area: Codigo de Usuario -----------------------*/
+//-------> importaciones, paquetes
+package Analizadores;
+import java.util.LinkedList;
+import java_cup.runtime.Symbol;
+import olc1.proyecto1.pkg201902888.Nodo;
+import olc1.proyecto1.pkg201902888.Arbol;
+import olc1.proyecto1.pkg201902888.Expresiones;
+import olc1.proyecto1.pkg201902888.Interfaz;
+import olc1.proyecto1.pkg201902888.error;
+import java.util.ArrayList;
+
+//------> Codigo para el parser,variables, metodos
+parser code
+{:
+    public static LinkedList<Expresiones> lista_er;
+    public static LinkedList<Expresiones> lista_conj;
+    public static LinkedList<String> lista_validaciones;
+    
+    public static String resultado="";
+    public static Nodo raiz;
+    public int conthojas=1;
+
+
+    public void syntax_error(Symbol s)
+    {
+        System.err.println("Error en la Linea " + (s.right+1) +" Columna "+(s.left+1)+ ". Identificador "+s.value + " no reconocido. Se ha recuperado del error." );
+        error nuevo = new error("Error Sintactico (Recuperado)", "El identificador: "+s.value.toString()+" no ha sido reconocido.", s.right+1, s.left+1);
+        Interfaz.listaErrores.add(nuevo);
+    }
+
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception
+    {
+        System.err.println("Error en la Linea " + (s.right+1)+ " Columna "+(s.left+1)+". Identificador " +s.value + " no reconocido.");
+        error nuevo = new error("Error Sintactico (no se pudo recuperar)", s.value.toString(), s.right+1, s.left+1);
+        Interfaz.listaErrores.add(nuevo);
+    }
+
+    public Nodo getRaiz(){
+        return raiz;
+    }
+
+:}
+
+//------> Codigo para las acciones gramaticales
+action code
+{:  :}
+
+/*--------------- 2da Area: Declaraciones -----------------------*/
+
+//------> declaracion de terminales 
+
+terminal String digito, letra, identificador, cadena, notacion,especiales; 
+terminal String dspnt,pyc,pnt,coma,mas,guion,llavea,llavec,para,parc,cora,corc;
+terminal String produce,mayorque,menorque,excla,porcen,or,kleen,guionb,virgulilla;
+terminal String comilladoble,comillasimple,salto,inter,CONJ;
+
+//------> declaracion de no terminales
+non terminal String INICIO, ER_CADENA,INTERVALO_VALORES,VALOR,LISTA_VALORES;
+non terminal LinkedList<Expresiones> SECCION_CONJUNTOS_EXPRESIONES;
+non terminal LinkedList<String> SECCION_VALIDACION_CADENAS;
+non terminal Expresiones EXPRESION_REGULAR, CONJUNTO;
+non terminal Nodo EXPRESION;
+
+//---------> Precedencias
+precedence left pnt;
+precedence left mas;
+precedence left or;
+precedence left kleen;
+precedence left inter;
+
+
+
+start with INICIO;
+
+/*--------------- 3ra Area: Reglas Semanticas -----------------------*/
+INICIO::= llavea SECCION_CONJUNTOS_EXPRESIONES:a porcen porcen porcen porcen  SECCION_VALIDACION_CADENAS:b llavec   {:  parser.lista_er = a;  parser.lista_validaciones = b; :}
+       |error
+ ;
+
+SECCION_CONJUNTOS_EXPRESIONES::=SECCION_CONJUNTOS_EXPRESIONES:a CONJUNTO:b                          {:  RESULT=a; RESULT.add(b);:}
+                            | SECCION_CONJUNTOS_EXPRESIONES:a EXPRESION_REGULAR:b                   {:  RESULT=a; RESULT.add(b); parser.conthojas = 1; :}
+                            | CONJUNTO:a                                                            {:  RESULT = new LinkedList<>(); RESULT.add(a); :}
+                            | EXPRESION_REGULAR:a                                                   {:  RESULT = new LinkedList<>(); RESULT.add(a); parser.conthojas = 1; :}
+                            | error
+                            ;
+ 
+CONJUNTO::= CONJ dspnt identificador:a guion mayorque INTERVALO_VALORES:b pyc    {:  RESULT=new Expresiones(a.toString()+"%-%"+b.toString(), null); :}
+           
+           ;
+
+INTERVALO_VALORES::= notacion:a                                  {:  RESULT=a.toString(); :}
+	| LISTA_VALORES:a                                        {:  RESULT=a; :}
+	| error
+        ;
+
+
+LISTA_VALORES::= LISTA_VALORES:a coma VALOR:b           {:  RESULT=a.toString()+", "+b.toString(); :}
+	| VALOR:a                                       {:  RESULT=a; :}
+	;
+
+VALOR::=letra:a                             {:  RESULT=a.toString(); :}
+    | salto:a                               {:  RESULT=a.toString(); :}
+    | comillasimple:a                       {:  RESULT=a.toString(); :}
+    | comilladoble:a                        {:  RESULT=a.toString(); :}
+    | digito:a                              {:  RESULT=a.toString(); :}
+    | especiales:a                          {:  RESULT=a.toString(); :}
+    | identificador:a                       {:  RESULT=a.toString(); :}
+    | cadena:a                              {:  RESULT=a.toString(); :}
+    ;
+
+EXPRESION_REGULAR::=identificador:a guion mayorque EXPRESION:b pyc      {:ArrayList<Integer> primeros =  new ArrayList<>(); primeros.add(parser.conthojas);
+                                                                        Nodo Hastag = new Nodo("N",primeros, primeros, null, null, null, "#", "", parser.conthojas); parser.conthojas++;
+                                                                        Nodo Concat = new Nodo(null,null,null,b,Hastag,null,".","",-1);Concat.CalcularAnulabilidad();Concat.CalcularPrimerosUltimos();
+                                                                        RESULT= new Expresiones(a.toString(), new Arbol(Concat)); :}
+          ;
+
+EXPRESION::=pnt EXPRESION:a EXPRESION:b                             {:  RESULT=new Nodo(null,null, null, a, b, null, ".","",-1);   RESULT.CalcularAnulabilidad();RESULT.CalcularPrimerosUltimos(); :}
+  | or EXPRESION:a EXPRESION:b                                      {:  RESULT=new Nodo(null,null, null, a, b, null, "|","",-1);    RESULT.CalcularAnulabilidad();RESULT.CalcularPrimerosUltimos(); :}
+  | kleen EXPRESION:a                                               {:  RESULT=new Nodo(null,null, null, a, null, null, "*","",-1); RESULT.CalcularAnulabilidad();RESULT.CalcularPrimerosUltimos(); :}
+  | mas EXPRESION:a                                                 {:  RESULT=new Nodo(null,null, null, a, null, null, "+","",-1); RESULT.CalcularAnulabilidad();RESULT.CalcularPrimerosUltimos(); :}
+  | inter EXPRESION:a                                               {:  RESULT=new Nodo(null,null, null, a, null, null, "?","",-1); RESULT.CalcularAnulabilidad();RESULT.CalcularPrimerosUltimos(); :}
+  | llavea EXPRESION:a llavec                                       {:  RESULT=a; :}
+  | para EXPRESION:a parc                                           {:  RESULT=a; :}
+  | VALOR:a                                                         {:  ArrayList<Integer> primeros =  new ArrayList<>(); primeros.add(parser.conthojas); RESULT=new Nodo(null, primeros, primeros, null, null, null, a.toString(), "", parser.conthojas); parser.conthojas++; RESULT.CalcularAnulabilidad();:}
+; 
+
+SECCION_VALIDACION_CADENAS::=SECCION_VALIDACION_CADENAS:a ER_CADENA:b           {:  RESULT=a; RESULT.add(b); :}
+                        |ER_CADENA:a                                            {:  RESULT=new LinkedList<>(); RESULT.add(a); :}
+                        |error
+                        ;
+ 
+ER_CADENA::= identificador:a dspnt:b cadena:c pyc:d {:  RESULT=a.toString()+b.toString()+c.toString()+d.toString(); :}
+        ;
+
+
+
+
