@@ -6,6 +6,8 @@
 package olc1.proyecto1.pkg201902888;
 
 
+import Analizadores.Analizador_Lexico;
+import Analizadores.Sintactico;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,13 +28,15 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Pablo
+ * @author ivann
  */
 public class Interfaz extends javax.swing.JFrame {
 
     public static LinkedList<Nodo> lista_nodos_arbols = new LinkedList<Nodo>();
-    
- 
+    public static LinkedList<AFD> AutomatasAFD = new LinkedList<AFD>();
+    public static LinkedList<Conjunto> lista_conjuntos = new LinkedList<>();
+    public LinkedList<String> lista_validaciones = new LinkedList<>();
+    public LinkedList<Expresiones> lista_er = new LinkedList<>();
 
     public static ArrayList<error> listaErrores = new ArrayList<error>();
     public String path = System.getProperty("user.dir");
