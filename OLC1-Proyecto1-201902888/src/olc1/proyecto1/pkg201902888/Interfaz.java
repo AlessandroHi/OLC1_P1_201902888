@@ -26,7 +26,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author ivann
+ * @author Pablo
  */
 public class Interfaz extends javax.swing.JFrame {
 
