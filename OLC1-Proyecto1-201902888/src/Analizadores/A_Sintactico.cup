@@ -25,15 +25,13 @@ parser code
     public void syntax_error(Symbol s)
     {
         System.err.println("Error en la Linea " + (s.right+1) +" Columna "+(s.left+1)+ ". Identificador "+s.value + " no reconocido. Se ha recuperado del error." );
-        error nuevo = new error("Error Sintactico (Recuperado)", "El identificador: "+s.value.toString()+" no ha sido reconocido.", s.right+1, s.left+1);
+        error nuevo = new error("Error lexico", "El identificador: "+s.value.toString()+" no ha sido reconocido.", s.right+1, s.left+1);
         Interfaz.listaErrores.add(nuevo);
     }
 
     public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception
     {
-        System.err.println("Error en la Linea " + (s.right+1)+ " Columna "+(s.left+1)+". Identificador " +s.value + " no reconocido.");
-        error nuevo = new error("Error Sintactico (no se pudo recuperar)", s.value.toString(), s.right+1, s.left+1);
-        Interfaz.listaErrores.add(nuevo);
+       
     }
 
     public Nodo getRaiz(){
@@ -52,11 +50,11 @@ action code
 
 terminal String digito, letra, identificador, cadena, notacion,especiales; 
 terminal String dspnt,pyc,pnt,coma,mas,guion,llavea,llavec,para,parc,cora,corc;
-terminal String produce,mayorque,menorque,excla,porcen,or,kleen,guionb,virgulilla;
+terminal String mayorque,excla,porcen,or,kleen,guionb,virgulilla;
 terminal String comilladoble,comillasimple,salto,inter,CONJ;
 
 //------> declaracion de no terminales
-non terminal String INICIO, ER_CADENA,INTERVALO_VALORES,VALOR,LISTA_VALORES;
+non terminal String INICIO, ER_CADENA,INTERVALO_VALORES,VALOR,LISTA_VALORES, PRODUCCION;
 non terminal LinkedList<Expresiones> SECCION_CONJUNTOS_EXPRESIONES;
 non terminal LinkedList<String> SECCION_VALIDACION_CADENAS;
 non terminal Expresiones EXPRESION_REGULAR, CONJUNTO;
@@ -85,9 +83,12 @@ SECCION_CONJUNTOS_EXPRESIONES::=SECCION_CONJUNTOS_EXPRESIONES:a CONJUNTO:b      
                             | error
                             ;
  
-CONJUNTO::= CONJ dspnt identificador:a guion mayorque INTERVALO_VALORES:b pyc    {:  RESULT=new Expresiones(a.toString()+"%-%"+b.toString(), null); :}
+CONJUNTO::= CONJ dspnt identificador:a PRODUCCION INTERVALO_VALORES:b pyc    {:  RESULT=new Expresiones(a.toString()+"%-%"+b.toString(), null); :}
            
            ;
+
+PRODUCCION::= guion mayorque 
+;
 
 INTERVALO_VALORES::= notacion:a                                  {:  RESULT=a.toString(); :}
 	| LISTA_VALORES:a                                        {:  RESULT=a; :}
@@ -107,9 +108,11 @@ VALOR::=letra:a                             {:  RESULT=a.toString(); :}
     | especiales:a                          {:  RESULT=a.toString(); :}
     | identificador:a                       {:  RESULT=a.toString(); :}
     | cadena:a                              {:  RESULT=a.toString(); :}
+    | guionb:a                               {:  RESULT=a.toString(); :}
+    | guion:a                              {:  RESULT=a.toString(); :}
     ;
 
-EXPRESION_REGULAR::=identificador:a guion mayorque EXPRESION:b pyc      {:ArrayList<Integer> primeros =  new ArrayList<>(); primeros.add(parser.conthojas);
+EXPRESION_REGULAR::=identificador:a PRODUCCION EXPRESION:b pyc      {:ArrayList<Integer> primeros =  new ArrayList<>(); primeros.add(parser.conthojas);
                                                                         Nodo Hastag = new Nodo("N",primeros, primeros, null, null, null, "#", "", parser.conthojas); parser.conthojas++;
                                                                         Nodo Concat = new Nodo(null,null,null,b,Hastag,null,".","",-1);Concat.CalcularAnulabilidad();Concat.CalcularPrimerosUltimos();
                                                                         RESULT= new Expresiones(a.toString(), new Arbol(Concat)); :}
@@ -127,10 +130,9 @@ EXPRESION::=pnt EXPRESION:a EXPRESION:b                             {:  RESULT=n
 
 SECCION_VALIDACION_CADENAS::=SECCION_VALIDACION_CADENAS:a ER_CADENA:b           {:  RESULT=a; RESULT.add(b); :}
                         |ER_CADENA:a                                            {:  RESULT=new LinkedList<>(); RESULT.add(a); :}
-                        |error
                         ;
  
-ER_CADENA::= identificador:a dspnt:b cadena:c pyc:d {:  RESULT=a.toString()+b.toString()+c.toString()+d.toString(); :}
+ER_CADENA::= identificador:a dspnt:b cadena:c pyc:d {:  RESULT=a.toString()+b.toString()+c.toString()+d.toString();  System.out.println(" CAPTURA DE LEXEMA "+ c); :}
         ;
 
 

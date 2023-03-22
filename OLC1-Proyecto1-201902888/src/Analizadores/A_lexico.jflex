@@ -31,7 +31,7 @@ import olc1.proyecto1.pkg201902888.error;
 //------> Expresiones Regulares
 digito              = [0-9]
 letra               = [a-zA-ZÑñ]
-identificador       = {letra}({letra}|{digito}|"_")*
+identificador       = {letra}({letra}|{digito})*
 cadena              = [\"][^\"\n]+[\"]
 notacion            = {letra} "~" {letra} | {digito} "~" {digito} | {especiales} "~" {especiales}
 especiales          =[!-/]|[:-@]|[\\-`]|[{-~]
@@ -66,9 +66,8 @@ comentarioMulti =  "<!" [^/] ~"!>"
 ")"         { System.out.println("Reconocio "+yytext()+" parc"); return new Symbol(Simbolos.parc, yycolumn, yyline, yytext()); }
 "["         { System.out.println("Reconocio "+yytext()+" cora"); return new Symbol(Simbolos.cora, yycolumn, yyline, yytext()); }
 "]"         { System.out.println("Reconocio "+yytext()+" corc"); return new Symbol(Simbolos.corc, yycolumn, yyline, yytext()); }
-//"->"        { System.out.println("Reconocio "+yytext()+" produccion"); return new Symbol(Simbolos.produce, yycolumn, yyline, yytext()); }
-">"         { System.out.println("Reconocio "+yytext()+" Mayor que"); return new Symbol(Simbolos.mayorque, yycolumn, yyline, yytext()); } 
-"<"         { System.out.println("Reconocio "+yytext()+" Menor que"); return new Symbol(Simbolos.menorque, yycolumn, yyline, yytext()); }       
+//"->"        { System.out.println("Reconocio "+yytext()+" produccion"); return new Symbol(Simbolos.produccion, yycolumn, yyline, yytext()); }
+">"         { System.out.println("Reconocio "+yytext()+" Mayor que"); return new Symbol(Simbolos.mayorque, yycolumn, yyline, yytext()); }       
 "!"         { System.out.println("Reconocio "+yytext()+" excla"); return new Symbol(Simbolos.excla, yycolumn, yyline, yytext()); }
 "%"        { System.out.println("Reconocio "+yytext()+"  porcentaje"); return new Symbol(Simbolos.porcen, yycolumn, yyline, yytext()); }
 "|"         { System.out.println("Reconocio "+yytext()+" or"); return new Symbol(Simbolos.or, yycolumn, yyline, yytext()); }
@@ -94,11 +93,11 @@ comentarioMulti =  "<!" [^/] ~"!>"
 //------> Espacios
 {comentariosimple}      {System.out.println("Comentario Simple: "+yytext()); }
 {comentarioMulti}       {System.out.println("Comentario Multiple: "+yytext()); }
-[ \t\r\n\f]             {/* Espacios en blanco, se ignoran */}
+[ \s\t\r\n\f]         {  /*este es un comentario en java, omitirlos*/ }
 
 
 //------> Errores Lexicos
 .                       { System.err.println("Error Lexico: "+yytext()+" Linea: "+yyline+" Columna: "+yycolumn); 
-                            error nuevo = new error("Error Lexico (Recuperado)", "El Simbolo: "+yytext()+" no pertenece al lenguaje", yyline, yycolumn);
+                            error nuevo = new error("Error Lexico", "El Simbolo: "+yytext()+" no pertenece al lenguaje", yyline +1, yycolumn +1);
                             Interfaz.listaErrores.add(nuevo);
                         }

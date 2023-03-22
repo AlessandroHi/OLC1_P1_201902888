@@ -8,31 +8,29 @@ package Analizadores;
 /** CUP generated class containing symbol constants. */
 public class Simbolos {
   /* terminals */
-  public static final int kleen = 26;
-  public static final int porcen = 24;
+  public static final int kleen = 24;
+  public static final int porcen = 22;
   public static final int parc = 17;
   public static final int pyc = 9;
   public static final int para = 16;
   public static final int cadena = 5;
-  public static final int guionb = 27;
+  public static final int guionb = 25;
   public static final int coma = 11;
-  public static final int salto = 31;
-  public static final int comilladoble = 29;
-  public static final int inter = 32;
-  public static final int comillasimple = 30;
-  public static final int or = 25;
-  public static final int produce = 20;
+  public static final int salto = 29;
+  public static final int comilladoble = 27;
+  public static final int inter = 30;
+  public static final int comillasimple = 28;
+  public static final int or = 23;
   public static final int guion = 13;
   public static final int digito = 2;
-  public static final int menorque = 22;
   public static final int EOF = 0;
   public static final int especiales = 7;
   public static final int letra = 3;
-  public static final int CONJ = 33;
-  public static final int virgulilla = 28;
-  public static final int excla = 23;
+  public static final int CONJ = 31;
+  public static final int virgulilla = 26;
+  public static final int excla = 21;
   public static final int notacion = 6;
-  public static final int mayorque = 21;
+  public static final int mayorque = 20;
   public static final int error = 1;
   public static final int dspnt = 8;
   public static final int corc = 19;
@@ -63,9 +61,7 @@ public class Simbolos {
   "parc",
   "cora",
   "corc",
-  "produce",
   "mayorque",
-  "menorque",
   "excla",
   "porcen",
   "or",
